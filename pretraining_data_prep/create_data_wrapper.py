@@ -17,11 +17,11 @@ if not os.path.isdir(DESTINATION_ROOT_FOLDER_PATH):
 
 # Find all wav files in source folder
 
-audio_paths = list(Path(SOURCE_ROOT_FOLDER_PATH).glob("**/*.wav"))
+audio_paths = list(Path(SOURCE_ROOT_FOLDER_PATH).glob("**/clean/*.wav"))
 
 # Get unique leaf level directiories in which wav files are present
 
-source_dir_structure = list(set([os.path.join(*(path).split("/")[:-1]) for str(path) in audio_paths]))
+source_dir_structure = list(set(["/"+os.path.join(*(path).split("/")[:-1]) for str(path) in audio_paths]))
 
 
 
