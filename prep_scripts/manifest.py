@@ -81,13 +81,13 @@ def main(args):
 
 
     ## Saving Training Manifest File
-    with open(os.path.join(args.dest, args.train_name + ".tsv"), "w") as train_f:
+    with open(os.path.join(args.dest, args.train_name + ".tsv"), "w+") as train_f:
         train_f.writelines(train_samples)
         print("** Writing Training Manifest File done with ", len(train_samples), " records")
 
     ## Saving Validation Manifest File only if it is to be made
     if len(valid_samples) != 1:
-        with open(os.path.join(args.dest, args.valid_name +  ".tsv"), "w") as valid_f:
+        with open(os.path.join(args.dest, args.valid_name +  ".tsv"), "w+") as valid_f:
             valid_f.writelines(valid_samples)
             print("** Writing Validation Manifest File done with ", len(valid_samples), " records")
 

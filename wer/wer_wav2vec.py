@@ -42,7 +42,7 @@ def clean_text(row):
     return row[0][0:row.ind]
 
 def preprocess(original_csv):
-    original_csv['ind'] = original_csv[0].str.index(' (None')
+    original_csv['ind'] = original_csv['text'].str.index('(None')
     original_csv['cleaned_text'] = original_csv.swifter.apply(clean_text, axis = 1)
     return original_csv
 
@@ -66,17 +66,38 @@ def calculate_cer(row):
 
 
 def run_pipeline(ground_truth, predicted):
-    original_csv = pd.read_csv(ground_truth, header=None)
-    azure_csv = pd.read_csv(predicted, header=None)
-    original_csv.head()
-    original_csv[0].values
+    # original_csv = pd.read_csv(ground_truth, header=None)
+    # azure_csv = pd.read_csv(predicted, header=None)
+
+    with open(ground_truth, encoding='utf-8') as file:
+        original_csv = file.readlines()
+    
+    original_csv = [line.strip() for line in original_csv]
+    original_csv = pd.DataFrame(original_csv, columns=['text'])
+
+    with open(predicted, encoding='utf-8') as file:
+        azure_csv = file.readlines()
+ 
+    azure_csv = [line.strip() for line in azure_csv]
+    azure_csv = pd.DataFrame(azure_csv, columns=['text'])
+
+    print(original_csv.head())
+    print(azure_csv.head())
+
+    print(len(original_csv))
+    print(len(azure_csv))
+   
+
     original_csv = preprocess(original_csv)
+    print('here')
     azure_csv = preprocess(azure_csv)
-    len(original_csv.cleaned_text)
-    len(azure_csv.cleaned_text)
+
+
     df_merged = pd.DataFrame(data = [original_csv.cleaned_text.values, azure_csv.cleaned_text.values],index=None)
     df_merged = df_merged.transpose()
     df_merged.columns = ['original', 'predicted']
+    print(df_merged.head())
+    
     df_merged['wer'] = df_merged.apply(calculate_wer, axis = 1)
     df_merged['cer'] = df_merged.swifter.apply(calculate_cer, axis = 1)
     df_merged['num_tokens'] = df_merged['original'].str.split().str.len()
