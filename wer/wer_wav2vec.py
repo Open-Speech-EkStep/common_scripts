@@ -66,9 +66,7 @@ def calculate_cer(row):
 
 
 def run_pipeline(ground_truth, predicted):
-    # original_csv = pd.read_csv(ground_truth, header=None)
-    # azure_csv = pd.read_csv(predicted, header=None)
-
+    
     with open(ground_truth, encoding='utf-8') as file:
         original_csv = file.readlines()
     
@@ -81,29 +79,20 @@ def run_pipeline(ground_truth, predicted):
     azure_csv = [line.strip() for line in azure_csv]
     azure_csv = pd.DataFrame(azure_csv, columns=['text'])
 
-    print(original_csv.head())
-    print(azure_csv.head())
-
-    print(len(original_csv))
-    print(len(azure_csv))
-   
 
     original_csv = preprocess(original_csv)
-    print('here')
     azure_csv = preprocess(azure_csv)
 
 
     df_merged = pd.DataFrame(data = [original_csv.cleaned_text.values, azure_csv.cleaned_text.values],index=None)
     df_merged = df_merged.transpose()
     df_merged.columns = ['original', 'predicted']
-    print(df_merged.head())
     
     df_merged['wer'] = df_merged.apply(calculate_wer, axis = 1)
     df_merged['cer'] = df_merged.swifter.apply(calculate_cer, axis = 1)
     df_merged['num_tokens'] = df_merged['original'].str.split().str.len()
     df_merged['num_chars'] = df_merged['original'].str.replace(' ','').str.len()
-    df_merged.head()
-    df_merged.head(1).values
+    
     df_merged.sort_values(by = 'wer', ascending=False)
     fwer = df_merged.wer.sum() / df_merged.num_tokens.sum()
     fcer = df_merged.cer.sum() / df_merged.num_chars.sum()
