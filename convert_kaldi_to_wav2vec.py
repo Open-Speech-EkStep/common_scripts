@@ -11,7 +11,7 @@ import argparse
 def read_segments_with_text(folder_name,  mode):
 
     segments = []
-    with open(folder_name + '/segments.txt') as file_local:
+    with open(folder_name + '/segments') as file_local:
         segments = file_local.readlines()
     segments = [seg.split(' ') for seg in segments]
     df_segment = pd.DataFrame(segments, columns = ['segment_id', 'file_id', 'start_time', 'end_time'])
@@ -19,7 +19,7 @@ def read_segments_with_text(folder_name,  mode):
 
     if mode=='train':
         text = []
-        with open(folder_name +'/text.txt') as file_local:
+        with open(folder_name +'/text') as file_local:
             text = file_local.readlines()
         text= [local_text.replace('\t',' ') for local_text in text]
         text = [local_text.split(' ',1) for local_text in text]
@@ -27,7 +27,7 @@ def read_segments_with_text(folder_name,  mode):
         df_text['transcription'] = df_text['transcription'].str.strip() 
 
     wavscp = []
-    with open(folder_name+'/wav.scp.txt') as file:
+    with open(folder_name+'/wav.scp') as file:
         wavscp = file.readlines()        
     wavscp = [utt.split('\t') for utt in wavscp]
     df_file_wav = pd.DataFrame(wavscp, columns =['file_id', 'file_path'])
@@ -60,12 +60,15 @@ def export_text_file(destination_file_path, text):
         file.writelines(text)
 
 def save_audio_files(row):
-    source_file_path = row.file_path_x
+    source_file_path = row.wav_path
+    #print(source_file_path)
+    if source_file_path== '-1':
+        return
     start_time = row.start_time
     end_time = row.end_time
     destination_file_path = row['destination']
     text = row['transcription']
-
+    #print(destination_file_path)
     if not os.path.exists(str(destination_file_path)):
         os.makedirs(destination_file_path, exist_ok=True)
         
@@ -79,13 +82,21 @@ def main(wav_folder_path, destination_folder_path, kaldi_files_path, mode):
     files_wav = glob.glob(wav_folder_path + '/**/*.wav', recursive=True)
 
     df_train = pd.DataFrame(files_wav, columns=['wav_path'])
-    df_train['folder'] = df['wav_path'].str.split('/').str[-2]
-    df_train['destination'] = destination_folder_path +'/' + df_train['folder'] 
-    df_merged = pd.merge(df_train, df_segment, on='file_id')
+    df_train['folder'] = df_train['wav_path'].str.split('/').str[-2]
+    df_train['destination'] = destination_folder_path +'/' + df_train['folder']
+    df_train['file_id'] = df_train['wav_path'].str.split('/').str[-1].str.split('.').str[0]
+    #print(df_train.head())
+    #print(df_segment.head())
+    df_merged = pd.merge(df_train, df_segment, on='file_id', how='right')
+    #print(df_merged)
+    #print(len(df_merged))
+    #print(len(df_segment))
     
+    #print(len(df_merged) == len(df_segment))
     if mode=='test':
         df_merged['transcription'] = 'ABC'
     
+    df_merged.fillna(value='-1', inplace=True)
     tqdm.pandas()
     df_merged.progress_apply(save_audio_files, axis=1)   
 
