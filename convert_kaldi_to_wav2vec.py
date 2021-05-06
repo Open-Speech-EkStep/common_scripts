@@ -26,9 +26,9 @@ df_nptel = get_dataframe(files_wav)
 
 df_train = pd.concat([df_iitm, df_nptel])
 df_train = df_train.reset_index(drop=True)
-df_processed = pd.read_csv('./interim/train_NPTEL_IITM.csv')
+df_processed = pd.read_csv('./interim/eval_IITM.csv')
 df_merged = pd.merge(df_train, df_processed, on='file_id')
-
+print(len(df_merged))
 
 
 ## Exporting Audios
@@ -40,12 +40,15 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 import swifter
 
-def crop_audio_file(source_file_path, start_time, end_time, destination_file_path):
+def crop_audio_file(source_file_path, start_time, end_time, destination_file_path, set_dummy_output=False):
     audio = AudioSegment.from_wav(source_file_path)
     start = start_time*1000.0
     end = end_time*1000.0
     cropped_audio = audio[start:end]
     cropped_audio.export(destination_file_path+'.wav',format='wav')
+    if set_dummy_output:
+        with open(destination_file_path+'.txt', mode='w+') as file:
+            file.writelines('ABC')
 
 
 def save_audio_files(row):
@@ -53,14 +56,14 @@ def save_audio_files(row):
     start_time = row.start_time
     end_time = row.end_time
     
-    destination_file_path = './processed/' + row['folder_type']+'/' + row['file_id']
+    destination_file_path = './eval/' + row['folder_type']+'/' + row['file_id']
     #print(destination_file_path)
     if not os.path.exists(str(destination_file_path)):
         os.makedirs(destination_file_path, exist_ok=True)
         
     destination_file = destination_file_path +'/' +row['segment_id']
     
-    crop_audio_file(source_file_path, start_time, end_time, destination_file)
+    crop_audio_file(source_file_path, start_time, end_time, destination_file, True)
 
 tqdm.pandas()
 
