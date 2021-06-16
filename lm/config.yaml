@@ -1,0 +1,5 @@
+Params:
+  Lang: 'en' # lang 
+  File: 'toy.txt' # input_file_name
+  Loc: '' # path_to_dir_containing_text_and_dict_file
+  Dict: 'dict.ltr.txt' # dict file containing charcter set
