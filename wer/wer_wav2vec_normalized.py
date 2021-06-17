@@ -97,7 +97,7 @@ def run_pipeline(ground_truth, predicted):
     df_merged_norm = pd.DataFrame(data = [original_csv.cleaned_text.values, azure_csv.cleaned_text.values],index=None)
     
     df_merged = df_merged.transpose()
-    df_merged_norm = pd.DataFrame(data = [original_csv.cleaned_text.values, azure_csv.cleaned_text.values],index=None)
+    df_merged_norm = df_merged_norm.transpose()
     
 
     df_merged.columns = ['original', 'predicted']
