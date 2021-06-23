@@ -3,7 +3,7 @@ import re
 import string
 import argparse
 from tqdm import tqdm
-
+from joblib import Parallel, delayed
 
 def get_clean_lines(line, pattern):
     '''
@@ -23,14 +23,15 @@ def clean_text(inp, out, dict):
         Text cleaning to replace punctuations from sentences and then remove sentences containing foreign language characters.
     '''
     with open(inp, mode='r', encoding='utf-8') as inp_file, open(out, mode='w+', encoding='utf-8') as out_file:
-        lines = [line.strip() for line in inp_file.readlines()]
+        lines = inp_file.read().splitlines()
         dict_pattern = get_regex_from_dict(dict)
         pattern = '[^ '+dict_pattern+']+'
 
-        for line in tqdm(lines):
-            clean_line = get_clean_lines(line, pattern)
-            if clean_line:
-                print(clean_line, file=out_file)
+        out = Parallel(n_jobs=-1)(delayed(get_clean_lines)(i, pattern) for i in tqdm(lines))
+        for line in out:
+            if line != '':
+                out_file.write(line)
+                out_file.write('\n')
 
 def get_regex_from_dict(dict):
     '''

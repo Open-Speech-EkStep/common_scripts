@@ -12,50 +12,22 @@ class PrepareData:
         self.file_name = file_name
         self.loc = loc
         self.dict_path = dict_path
-    
+
     def run_pipeline(self):
         os.chdir(self.loc)
         
-        if self.lang == 'hi':
+        print("normalize and tokenize file")
+        normalized_file_name = self.file_name.split('.')[0] + '.norm.tok.txt'
+        normalize_file(self.lang, self.file_name, normalized_file_name)
 
-            print("normalize file")
-            normalized_file_name = self.file_name.split('.')[0] + '.norm.txt'
-            normalize_file(self.lang, self.file_name, normalized_file_name)
+        print("removing punctuation with single space and removing lines with foreign characters")
+        clean_file_name = normalized_file_name.replace('.txt', '.clean.txt')
+        clean_text(normalized_file_name, clean_file_name, self.dict_path)
 
-            print("removing punctuation with single space and removing lines with foreign characters")
-            clean_file_name = normalized_file_name.replace('.txt', '.clean.txt')
-            clean_text(normalized_file_name, clean_file_name, self.dict_path)
+        print("removing duplicate lines")
+        unique_file_name = clean_file_name.replace('.txt', '.unique.txt')
+        remove_duplicate(clean_file_name, unique_file_name)
 
-            print("tokenizing file")
-            tokenized_file_name = clean_file_name.replace('.txt', '.tok.txt')
-            tokenize(clean_file_name, tokenized_file_name, self.lang)
-
-            print("removing duplicate lines")
-            unique_file_name = tokenized_file_name.replace('.txt', '.unique.txt')
-            remove_duplicate(tokenized_file_name, unique_file_name)
-
-        if self.lang == 'en':
-
-            print("removing punctuation with single space and removing lines with foreign characters")
-            clean_file_name = self.file_name.replace('.txt', '.clean.txt')
-            clean_text(self.file_name, clean_file_name, self.dict_path)
-
-            print("tokenizing file")
-            tokenized_file_name = clean_file_name.replace('.txt', '.tok.txt')
-            tokenize(clean_file_name, tokenized_file_name, self.lang)
-
-            print("removing duplicate lines")
-            unique_file_name = tokenized_file_name.replace('.txt', '.unique.txt')
-            remove_duplicate(tokenized_file_name, unique_file_name)
-
-
-        #print("creating lm.binary")
-        #make_lm_cmd = f'python generate_lm.py --input_txt {unique_file_name} --output_dir {self.dst_folder} --top_k 500000 --kenlm_bins {self.kenlm_bin_path} --arpa_order 5 --max_arpa_memory "85%" --arpa_prune "0|0|1" --binary_a_bits 255 --binary_q_bits 8 --binary_type trie'
-        #os.system(make_lm_cmd)
-        
-        #print("creating lexicon from vocab")
-        # make_lexicon_lst_from_txt_file(dst + '/vocab-500000.txt', dst + '/lexicon.lst')
-        
         print('completed')
 
 
