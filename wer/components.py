@@ -2,6 +2,7 @@ import jiwer
 import jiwer.transforms as tr
 
 from jiwer import compute_measures
+from typing import List
 
 def compute_wer(predictions=None, references=None, concatenate_texts=False):
     if concatenate_texts:
