@@ -2,6 +2,7 @@ from pydub import AudioSegment, effects
 import glob
 import os
 from tqdm import tqdm
+import argparse
 
 class AudioNormalization:
     def __init__(self, wav_file):
