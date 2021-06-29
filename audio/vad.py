@@ -35,6 +35,9 @@ def write_wave(path, audio, sample_rate):
         wf.setframerate(sample_rate)
         wf.writeframes(audio)
 
+def write_text(path):
+    with open(path, mode='w+') as file:
+        file.writelines('ABC')
 
 class Frame(object):
     """Represents a "frame" of audio data."""
@@ -100,7 +103,7 @@ def vad_collector(sample_rate, frame_duration_ms,
     for frame in frames:
         is_speech = vad.is_speech(frame.bytes, sample_rate)
 
-        sys.stdout.write('1' if is_speech else '0')
+        #sys.stdout.write('1' if is_speech else '0')
         if not triggered:
             ring_buffer.append((frame, is_speech))
             num_voiced = len([f for f, speech in ring_buffer if speech])
@@ -126,14 +129,14 @@ def vad_collector(sample_rate, frame_duration_ms,
             # unvoiced, then enter NOTTRIGGERED and yield whatever
             # audio we've collected.
             if num_unvoiced > 0.9 * ring_buffer.maxlen:
-                sys.stdout.write('-(%s)' % (frame.timestamp + frame.duration))
+                #sys.stdout.write('-(%s)' % (frame.timestamp + frame.duration))
                 triggered = False
                 yield b''.join([f.bytes for f in voiced_frames])
                 ring_buffer.clear()
                 voiced_frames = []
-    if triggered:
-        sys.stdout.write('-(%s)' % (frame.timestamp + frame.duration))
-    sys.stdout.write('\n')
+    #if triggered:
+        #sys.stdout.write('-(%s)' % (frame.timestamp + frame.duration))
+    #sys.stdout.write('\n')
     # If we have any leftover voiced audio when we run out of input,
     # yield it.
     if voiced_frames:
@@ -148,6 +151,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--input', required=True, help='Input path')
     parser.add_argument('-o', '--output', required=True, help='Output path')
     parser.add_argument('-a', '--agg', default=2, required=True, help='Aggresiveness')
+    parser.add_argument('-d', '--dummy', default=False)
 
     args_local = parser.parse_args()
     
@@ -172,5 +176,6 @@ if __name__ == '__main__':
             
         for i, segment in enumerate(segments):
             path = destination_path + str(i) + '_' + filename
-            #print(' Writing %s' % (path,))
             write_wave(path, segment, sample_rate)
+            if args_local.dummy:
+                write_text(path.replace('.wav', '.txt')
