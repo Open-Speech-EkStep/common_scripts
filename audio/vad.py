@@ -178,4 +178,4 @@ if __name__ == '__main__':
             path = destination_path + str(i) + '_' + filename
             write_wave(path, segment, sample_rate)
             if args_local.dummy:
-                write_text(path.replace('.wav', '.txt')
+                write_text(path.replace('.wav', '.txt'))
