@@ -165,8 +165,9 @@ if __name__ == '__main__':
         segments = vad_collector(sample_rate, 30, 300, vad, frames)
 
         filename = file.split('/')[-1]
+        filename_extract = filename.split('.')[0]
         path = "/".join( file.split('/')[0:-1] )
-        destination_path = path.replace(args_local.input, args_local.output) + '/' + filename + '/'
+        destination_path = path.replace(args_local.input, args_local.output) + '/' + filename_extract + '/'
         os.makedirs(destination_path, exist_ok=True)
             
         for i, segment in enumerate(segments):
