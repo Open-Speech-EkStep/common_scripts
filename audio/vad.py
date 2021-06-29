@@ -157,7 +157,7 @@ if __name__ == '__main__':
     
     for file in tqdm(all_files):
         audio, sample_rate = read_wave(file)
-        vad = webrtcvad.Vad(args_local.agg)
+        vad = webrtcvad.Vad(int(args_local.agg))
 
         frames = frame_generator(30, audio, sample_rate)
         frames = list(frames)
