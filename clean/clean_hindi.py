@@ -19,6 +19,12 @@ pattern = "[^ ँ-ःअ-ऋए-ऑओ-नप-रलव-हा-ृॅे-ॉो-
     
 normalizer = IndicNormalizerFactory().get_normalizer(lang)
 
+
+def noramlize_and_tok_text(sent):
+    normalized = normalizer.normalize(sent)
+    processed = ' '.join(trivial_tokenize(normalized, lang))
+    return processed
+
 def get_clean_lines(line, pattern):
     
     '''
@@ -26,6 +32,8 @@ def get_clean_lines(line, pattern):
     '''
     
     line = re.sub('[%s]' % re.escape("!\।\"#$%&\()*+,-./:;<=>?@[\\]^_`{|}~"), '', line)
+    line = noramlize_and_tok_text(line)
+    line = line.replace('Noise', '')
     
     if not re.search(pattern, line):
         return ' '.join([word.upper() for word in line.split() if word])
@@ -53,10 +61,6 @@ def copy_file(src, dst, sym):
 def get_duration(fpath):
     return sox.file_info.duration(fpath)
 
-def noramlize_and_tok_text(sent):
-    normalized = normalizer.normalize(sent)
-    processed = ' '.join(trivial_tokenize(normalized, lang))
-    return processed
 
 def process_text_file(fpath, dst_txt_path, sym):
     sentence = read_text_file(fpath)
@@ -68,7 +72,7 @@ def process_text_file(fpath, dst_txt_path, sym):
     
     if not cleaned_sentence == '':
         
-        cleaned_sentence = noramlize_and_tok_text(cleaned_sentence)
+       
         
         write_text_file(cleaned_sentence, dst_txt_path)
         copy_file(fpath.replace('.txt', '.wav'), dst_txt_path.replace('.txt', '.wav'), sym)
