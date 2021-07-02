@@ -40,6 +40,7 @@ def get_clean_lines(line, pattern):
     line = line.replace('Laugh', '')
     line = line.replace('music', '')
     line = line.replace('I', '')
+    line = line.replace('Applause', '')
     
     if not re.search(pattern, line):
         return ' '.join([word.upper() for word in line.split() if word])
