@@ -9,6 +9,8 @@ from tqdm import tqdm
 from joblib import Parallel, delayed
 from glob import glob
 
+pattern = "[^ 'A-Z]+"
+
 def get_clean_lines(line, pattern):
     
     '''
@@ -42,7 +44,7 @@ def copy_file(src, dst, sym):
 def get_duration(fpath):
     return sox.file_info.duration(fpath)
 
-def process_text_file(fpath, dst_txt_path, pattern, sym):
+def process_text_file(fpath, dst_txt_path, sym):
     sentence = read_text_file(fpath)
     cleaned_sentence = get_clean_lines(sentence, pattern)
     
@@ -72,9 +74,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     txt_file_list = get_file_list(args.input_folder)
-        
-    pattern = "[^ 'A-Z]+"
     
-    duration_rejected = Parallel(n_jobs=-1)(delayed(process_text_file)(fpath, fpath.replace(args.input_folder, args.output_folder), pattern, args.symlink) for fpath in tqdm(txt_file_list))
+    duration_rejected = Parallel(n_jobs=-1)(delayed(process_text_file)(fpath, fpath.replace(args.input_folder, args.output_folder), args.symlink) for fpath in tqdm(txt_file_list))
     
     print(f"Duration rejected {sum(duration_rejected)/3600:.3f} Hours")
