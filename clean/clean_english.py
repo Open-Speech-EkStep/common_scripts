@@ -30,14 +30,19 @@ def write_text_file(line, fpath):
     with open(fpath, 'w+', encoding='utf-8') as f:
         return f.write(line)
 
-def copy_file(src, dst):
-    copy_cmd = 'cp ' + src + ' ' + dst
-    os.system(copy_cmd)
+def copy_file(src, dst, sym):
+    copy_cmd_cp = 'cp ' + src + ' ' + dst
+    copy_cmd_sym = 'ln -s ' + src + ' ' + dst
+    
+    if sym:
+        os.system(copy_cmd_sym)
+    else:
+        os.system(copy_cmd_cp)
     
 def get_duration(fpath):
     return sox.file_info.duration(fpath)
 
-def process_text_file(fpath, dst_txt_path, pattern):
+def process_text_file(fpath, dst_txt_path, pattern, sym):
     sentence = read_text_file(fpath)
     cleaned_sentence = get_clean_lines(sentence, pattern)
     
@@ -48,7 +53,7 @@ def process_text_file(fpath, dst_txt_path, pattern):
     if not cleaned_sentence == '':
         
         write_text_file(cleaned_sentence, dst_txt_path)
-        copy_file(fpath.replace('.txt', '.wav'), dst_txt_path.replace('.txt', '.wav'))
+        copy_file(fpath.replace('.txt', '.wav'), dst_txt_path.replace('.txt', '.wav'), sym)
         
         return 0
         
@@ -63,12 +68,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input-folder', '-i', type=str)
     parser.add_argument('--output-folder', '-o', type=str)
+    parser.add_argument('--symlink', '-s', type=bool, default=False)
     args = parser.parse_args()
     
     txt_file_list = get_file_list(args.input_folder)
         
     pattern = "[^ 'A-Z]+"
     
-    duration_rejected = Parallel(n_jobs=-1)(delayed(process_text_file)(fpath, fpath.replace(args.input_folder, args.output_folder), pattern) for fpath in tqdm(txt_file_list))
+    duration_rejected = Parallel(n_jobs=-1)(delayed(process_text_file)(fpath, fpath.replace(args.input_folder, args.output_folder), pattern, args.symlink) for fpath in tqdm(txt_file_list))
     
     print(f"Duration rejected {sum(duration_rejected)/3600:.3f} Hours")
