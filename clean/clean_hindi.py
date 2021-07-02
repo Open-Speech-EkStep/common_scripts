@@ -30,6 +30,7 @@ def get_clean_lines(line, pattern):
     if not re.search(pattern, line):
         return ' '.join([word.upper() for word in line.split() if word])
     else:
+        print(line)
         return ''
     
 def read_text_file(fpath):
