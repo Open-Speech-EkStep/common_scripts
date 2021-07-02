@@ -34,6 +34,11 @@ def get_clean_lines(line, pattern):
     line = re.sub('[%s]' % re.escape("!\।\"#$%&\()*+,-./:;<=>?@[\\]^_`{|}~"), '', line)
     line = noramlize_and_tok_text(line)
     line = line.replace('Noise', '')
+    line = line.replace('cough', '')
+    line = line.replace('babble', '')
+    line = line.replace('Overlap', '')
+    line = line.replace('Laugh', '')
+    line = line.replace('music', '')
     
     if not re.search(pattern, line):
         return ' '.join([word.upper() for word in line.split() if word])
