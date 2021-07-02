@@ -25,7 +25,7 @@ def get_clean_lines(line, pattern):
     Returns line if no foreign character other than pattern is present else returns empty string
     '''
     
-    line = re.sub('[%s]' % re.escape("!\"#$%&\()*+,-./:;<=>?@[\\]^_`{|}~"), '', line)
+    line = re.sub('[%s]' % re.escape("!\।\"#$%&\()*+,-./:;<=>?@[\\]^_`{|}~"), '', line)
     
     if not re.search(pattern, line):
         return ' '.join([word.upper() for word in line.split() if word])
