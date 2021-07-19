@@ -13,10 +13,10 @@ from indicnlp.tokenize.indic_tokenize import trivial_tokenize
 from indicnlp.normalize.indic_normalize import IndicNormalizerFactory
 
 
-lang = 'ta'
+lang = 'te'
 
-pattern = "[^ ஃஅ-ஊஎ-ஐஒ-கங-சஜஞ-டண-தந-பம-ஹா-ூெ-ைொ-்]+"
-    
+pattern="[^ ం-ఃఅ-ఌఎ-ఐఒ-నప-ళవ-హా-ౄె-ైొ-్ౠ]+"  
+
 normalizer = IndicNormalizerFactory().get_normalizer(lang)
 
 def get_clean_lines(line, pattern):
