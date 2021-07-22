@@ -6,7 +6,7 @@ import io
 import os
 import subprocess
 from collections import Counter
-
+import itertools
 from tqdm import tqdm
 from joblib import Parallel, delayed
 
@@ -24,11 +24,13 @@ def convert_and_filter_topk(args):
 
 
     print("\nCalculating number of words")
-    words = []
-    words_list = [line_lower.split() for line_lower in tqdm(lines)]
-    for item in words_list:
-        for local_item in item:
-            words.append(local_item)
+    words = list(itertools.chain(*[line.split() for line in tqdm(lines)]))
+    
+#     words = []
+#     words_list = [line_lower.split() for line_lower in tqdm(lines)]
+#     for item in words_list:
+#         for local_item in item:
+#             words.append(local_item)
 
     print("\nCounting Word Frequencies ")
     counter = Counter(words)
@@ -37,7 +39,7 @@ def convert_and_filter_topk(args):
     print("\nWriting File")
     with open(data_lower, mode='w+', encoding="utf-8") as file_out:
         file_out.writelines(lines)
-
+   
 
     # Save top-k words
     print("\nSaving top {} words ...".format(args.top_k))
