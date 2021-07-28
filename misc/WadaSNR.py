@@ -56,7 +56,7 @@ def main(inp_folder):
             file.write("\n")
 
     print(f"\n\n\n > Average SNR of the dataset:{np.mean(snrs)}")
-    print(f"\n To check snr values of eadh file open SNR_values.csv")
+    print(f"\n To check snr values of each file open SNR_values.csv")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
