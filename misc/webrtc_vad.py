@@ -1,4 +1,4 @@
-# Usage -> python webrtc_vad.py -a 3 -w /path/to/wav -o /destination/folder/path
+# Usage -> python webrtc_vad.py --aggressiveness=3 --wav-path='path/to/wav/file' --output-path='path/to/save/chunked/files'
 
 import collections
 import contextlib
