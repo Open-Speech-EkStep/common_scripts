@@ -13,7 +13,7 @@ CC              = gcc
 
 
 CFLAGS = 	${HEADER_PATH}\
-		-O3 -m32
+		-O3 -m64
 		
 
 HEADER_PATH 	=-I../Header\
