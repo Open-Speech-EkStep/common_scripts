@@ -123,10 +123,11 @@ class KrutidevToUnicode:
             # Eliminating reph "Z" and putting 'half - r' at proper position for this.
             set_of_matras = "अ आ इ ई उ ऊ ए ऐ ओ औ ा ि ी ु ू ृ े ै ो ौ ं : ँ ॅ"
             position_of_R = processPart.find("Z")
-            print("position of r", position_of_R)
+
             while position_of_R > -1:
                 probable_position_of_half_r = position_of_R - 1
-                charecter_at_probable_position_of_half_r = processPart[probable_position_of_half_r
+                charecter_at_probable_position_of_half_r = processPart[probable_position_of_half_r]
+
 
 
                 # trying to find non-maatra position left to current O (ie, half -r).
@@ -137,6 +138,7 @@ class KrutidevToUnicode:
                 #charecter_to_be_replaced = processPart[probable_position_of_half_r]
                 charecter_to_be_replaced = processPart[
                     probable_position_of_half_r: (position_of_R - probable_position_of_half_r)+2]
+
                 new_replacement_string = "र्" + charecter_to_be_replaced
                 charecter_to_be_replaced = charecter_to_be_replaced + "Z"
                 processPart = processPart.replace(charecter_to_be_replaced, new_replacement_string)
