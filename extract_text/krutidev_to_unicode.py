@@ -74,10 +74,6 @@ class KrutidevToUnicode:
                                                       KrutidevToUnicode.CHARS_UNICODE[input_symbol_idx])
                     idx = processPart.find(KrutidevToUnicode.CHARS_KD[input_symbol_idx])
 
-            # Code for Replacing five Special glyphs
-
-            # Code for Glyph1 : ± (reph+anusvAr)
-
             processPart = processPart.replace('±', "Zं")
 
             # Glyp2: Æ
