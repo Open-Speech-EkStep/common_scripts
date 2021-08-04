@@ -10,11 +10,13 @@ from pdfminer.pdfinterp import PDFPageInterpreter
 from io import StringIO
 from krutidev_to_unicode import KrutidevToUnicode
 import parameters
+from glob import glob
+from tqdm import tqdm
 
 
 class ExtractText:
-    def __init__(self):
-        self.file_path = parameters.PDF_FILE_PATH
+    def __init__(self, file_path):
+        self.file_path = file_path
 
     def get_text(self):
         with open(self.file_path, 'rb') as input_file:
@@ -55,15 +57,26 @@ class ExtractText:
         clean_unicode_sentence_list = [l.strip() for l in unicode_sentence_list]
         return clean_unicode_sentence_list
 
-    def create_txt_file(self):
+    def create_txt_file(self, file_path):
         unicode_sentences_list = self.clean_text()
-        txt_file_path = '/'.join(self.file_path.split('/')[:-1])
-        txt_file_name = self.file_path.split('/')[-1].replace('.pdf', '.txt')
-        with open(os.path.join(txt_file_path, txt_file_name), 'w') as f:
+        #txt_file_path = '/'.join(self.file_path.split('/')[:-1])
+        #txt_file_name = self.file_path.split('/')[-1].replace('.pdf', '.txt')
+        with open(file_path, 'w', encoding='utf-8') as f:
             f.write('\n'.join(unicode_sentences_list))
 
 
-if __name__ == '__main__':
-    text = ExtractText().convert_to_unicode()
-    ExtractText().create_txt_file()
 
+if __name__ == '__main__':
+    pdf_folder_path = parameters.PDF_FOLDER_PATH
+    txt_folder_path = parameters.TXT_FOLDER_PATH
+    pdf_files = glob(pdf_folder_path + '/' + '*.pdf')
+    '''
+    for pdf_file in tqdm(pdf_files[1:]):
+        print(pdf_file)
+        txt_file_name = pdf_file.split('/')[-1].replace('.pdf', '.txt')
+        ExtractText(pdf_file).create_txt_file(txt_folder_path + '/' + txt_file_name)
+        print("done")
+
+    '''
+    text = ExtractText('/home/anirudh/news_on_air/maithili/pdf/writereaddata_Bulletins_Text_Regional_2021_May_Regional-Patna-Maithili-1815-1820-20215920135.pdf').convert_to_unicode()
+    print(text)
