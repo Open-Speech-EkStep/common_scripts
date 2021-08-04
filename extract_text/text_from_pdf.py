@@ -8,7 +8,6 @@ from pdfminer.pdfpage import PDFTextExtractionNotAllowed
 from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.pdfinterp import PDFPageInterpreter
 from io import StringIO
-from krutidev_to_unicode import KrutidevToUnicode
 from krutidev_unicode_converter import krutidev_to_unicode
 import parameters
 from glob import glob
@@ -70,13 +69,10 @@ if __name__ == '__main__':
     pdf_folder_path = parameters.PDF_FOLDER_PATH
     txt_folder_path = parameters.TXT_FOLDER_PATH
     pdf_files = glob(pdf_folder_path + '/' + '*.pdf')
-    '''
-    for pdf_file in tqdm(pdf_files[1:]):
-        print(pdf_file)
+    
+    for pdf_file in tqdm(pdf_files):
         txt_file_name = pdf_file.split('/')[-1].replace('.pdf', '.txt')
         ExtractText(pdf_file).create_txt_file(txt_folder_path + '/' + txt_file_name)
-        print("done")
-
-    '''
-    text = ExtractText('/home/anirudh/Desktop/news_on_air_website_data_Text_Regional_Maithili_writereaddata_Bulletins_Text_Regional_2018_Dec_Regional-Patna-Maithily-1815-1820-20181210193927.pdf').convert_to_unicode()
-    print(text)
+    
+    #text = ExtractText('/home/anirudh/Desktop/news_on_air_website_data_Text_Regional_Maithili_writereaddata_Bulletins_Text_Regional_2018_Dec_Regional-Patna-Maithily-1815-1820-20181210193927.pdf').convert_to_unicode()
+    #print(text)
