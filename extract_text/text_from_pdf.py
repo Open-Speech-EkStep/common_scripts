@@ -9,6 +9,7 @@ from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.pdfinterp import PDFPageInterpreter
 from io import StringIO
 from krutidev_to_unicode import KrutidevToUnicode
+from krutidev_unicode_converter import krutidev_to_unicode
 import parameters
 from glob import glob
 from tqdm import tqdm
@@ -38,7 +39,7 @@ class ExtractText:
 
     def convert_to_unicode(self, sep='।'):
         krutidev_lines = self.get_text().split('\n')
-        unicode_lines = [KrutidevToUnicode.convert_to_unicode(line) for line in krutidev_lines]
+        unicode_lines = [krutidev_to_unicode(line) for line in krutidev_lines]
         combined_text = ''
         for line in unicode_lines:
             words = line.split()
@@ -65,7 +66,6 @@ class ExtractText:
             f.write('\n'.join(unicode_sentences_list))
 
 
-
 if __name__ == '__main__':
     pdf_folder_path = parameters.PDF_FOLDER_PATH
     txt_folder_path = parameters.TXT_FOLDER_PATH
@@ -78,5 +78,5 @@ if __name__ == '__main__':
         print("done")
 
     '''
-    text = ExtractText('/home/anirudh/news_on_air/maithili/pdf/writereaddata_Bulletins_Text_Regional_2021_May_Regional-Patna-Maithili-1815-1820-20215920135.pdf').convert_to_unicode()
+    text = ExtractText('/home/anirudh/Desktop/news_on_air_website_data_Text_Regional_Maithili_writereaddata_Bulletins_Text_Regional_2018_Dec_Regional-Patna-Maithily-1815-1820-20181210193927.pdf').convert_to_unicode()
     print(text)

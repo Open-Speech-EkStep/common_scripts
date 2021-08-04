@@ -1,2 +1,3 @@
 pdfminer.six==20201018
 aeneas==1.7.3.0
+tqdm==4.62.0
