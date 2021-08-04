@@ -12,6 +12,7 @@ from krutidev_unicode_converter import krutidev_to_unicode
 import parameters
 from glob import glob
 from tqdm import tqdm
+from joblib import Parallel, delayed
 
 
 class ExtractText:
@@ -59,8 +60,6 @@ class ExtractText:
 
     def create_txt_file(self, file_path):
         unicode_sentences_list = self.clean_text()
-        #txt_file_path = '/'.join(self.file_path.split('/')[:-1])
-        #txt_file_name = self.file_path.split('/')[-1].replace('.pdf', '.txt')
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write('\n'.join(unicode_sentences_list))
 
@@ -73,6 +72,3 @@ if __name__ == '__main__':
     for pdf_file in tqdm(pdf_files):
         txt_file_name = pdf_file.split('/')[-1].replace('.pdf', '.txt')
         ExtractText(pdf_file).create_txt_file(txt_folder_path + '/' + txt_file_name)
-    
-    #text = ExtractText('/home/anirudh/Desktop/news_on_air_website_data_Text_Regional_Maithili_writereaddata_Bulletins_Text_Regional_2018_Dec_Regional-Patna-Maithily-1815-1820-20181210193927.pdf').convert_to_unicode()
-    #print(text)

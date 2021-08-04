@@ -7,14 +7,16 @@ from aeneas.task import Task
 from aeneas.task import TaskConfiguration
 from aeneas.textfile import TextFileFormat
 import aeneas.globalconstants as gc
+import pandas as pd
+from tqdm import tqdm
 
 
 class ForcedAlignment:
-    def __init__(self):
-        self.audio_file_path = parameters.AUDIO_FILE_PATH
-        self.txt_file_path = parameters.TXT_FILE_PATH
+    def __init__(self, audio_file_path, txt_file_path):
+        self.audio_file_path = audio_file_path
+        self.txt_file_path = txt_file_path
 
-    def align_audio_and_text(self):
+    def align_audio_and_text(self, file_path):
         config = TaskConfiguration()
         config[gc.PPN_TASK_LANGUAGE] = Language.HIN
         config[gc.PPN_TASK_IS_TEXT_FILE_FORMAT] = TextFileFormat.PLAIN
@@ -24,13 +26,28 @@ class ForcedAlignment:
 
         task.audio_file_path_absolute = self.audio_file_path
         task.text_file_path_absolute = self.txt_file_path
-        task.sync_map_file_path_absolute = 'data/test.json'
+        task.sync_map_file_path_absolute = file_path
         ExecuteTask(task).execute()
         task.output_sync_map_file()
 
 
 if __name__ == '__main__':
-    ForcedAlignment().align_audio_and_text()
+
+    df = pd.read_csv(parameters.METADA_CSV_PATH)
+
+    df['local_audio_path'] = df['audio_path'].apply(lambda x: parameters.AUDIO_FOLDER_PATH + '/' + x.split('/')[-1])
+    df['local_text_path'] = df['text_path'].apply(lambda x: parameters.TXT_FOLDER_PATH + '/' + x.split('/')[-1])
+    df['local_text_path'] = df['local_text_path'].apply(lambda x: x.replace('.pdf', '.txt'))
+
+    for idx in tqdm(range(len(df))):
+        #print(df.iloc[idx]['local_audio_path'], df.iloc[idx]['local_text_path'])
+        #print(parameters.SYNCMAP_PATH + '/' + df.iloc[idx]['local_audio_path'].split('/')[-1].replace('.mp3', '.json'))
+        ForcedAlignment(df.iloc[idx]['local_audio_path'],
+        df.iloc[idx]['local_text_path']).align_audio_and_text(parameters.SYNCMAP_PATH + '/' + df.iloc[idx]['local_audio_path'].split('/')[-1].replace('.mp3', '.json'))
+
+    #print(df.head())
+
+    #ForcedAlignment().align_audio_and_text()
 
 
 
