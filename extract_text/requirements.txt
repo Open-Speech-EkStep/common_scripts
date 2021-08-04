@@ -1,0 +1,2 @@
+pdfminer.six==20201018
+aeneas==1.7.3.0
