@@ -1,3 +1,4 @@
+import os
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfparser import PDFParser
@@ -8,11 +9,12 @@ from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.pdfinterp import PDFPageInterpreter
 from io import StringIO
 from krutidev_to_unicode import KrutidevToUnicode
+import parameters
 
 
 class ExtractText:
-    def __init__(self, file_path):
-        self.file_path = file_path
+    def __init__(self):
+        self.file_path = parameters.PDF_FILE_PATH
 
     def get_text(self):
         with open(self.file_path, 'rb') as input_file:
@@ -44,9 +46,24 @@ class ExtractText:
         unicode_sentences = combined_text.split(sep=sep)
         return unicode_sentences
 
+    def clean_text(self):
+        unicode_sentence_list = self.convert_to_unicode()
+        unicode_sentence_list = [l.replace('(', ' ') for l in unicode_sentence_list]
+        unicode_sentence_list = [l.replace(')', ' ') for l in unicode_sentence_list]
+        unicode_sentence_list = [l.replace('-', '') for l in unicode_sentence_list]
+        unicode_sentence_list = [l.replace(',', '') for l in unicode_sentence_list]
+        clean_unicode_sentence_list = [l.strip() for l in unicode_sentence_list]
+        return clean_unicode_sentence_list
+
+    def create_txt_file(self):
+        unicode_sentences_list = self.clean_text()
+        txt_file_path = '/'.join(self.file_path.split('/')[:-1])
+        txt_file_name = self.file_path.split('/')[-1].replace('.pdf', '.txt')
+        with open(os.path.join(txt_file_path, txt_file_name), 'w') as f:
+            f.write('\n'.join(unicode_sentences_list))
+
 
 if __name__ == '__main__':
-    text = ExtractText('/home/anirudh/Desktop/news_on_air_website_data_Text_Regional_Maithili_writereaddata_Bulletins_Text_Regional_2018_Dec_Regional-Patna-Maithily-1815-1820-20181210193927.pdf').convert_to_unicode()
-    #print(len(text))
-    #print(text)
+    text = ExtractText().convert_to_unicode()
+    ExtractText().create_txt_file()
 
