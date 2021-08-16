@@ -9,6 +9,7 @@ from aeneas.textfile import TextFileFormat
 import aeneas.globalconstants as gc
 import pandas as pd
 from tqdm import tqdm
+import os
 
 
 class ForcedAlignment:
@@ -39,15 +40,21 @@ if __name__ == '__main__':
     df['local_text_path'] = df['text_path'].apply(lambda x: parameters.TXT_FOLDER_PATH + '/' + x.split('/')[-1])
     df['local_text_path'] = df['local_text_path'].apply(lambda x: x.replace('.pdf', '.txt'))
 
+    empty_txts = []
+
     for idx in tqdm(range(len(df))):
-        #print(df.iloc[idx]['local_audio_path'], df.iloc[idx]['local_text_path'])
-        #print(parameters.SYNCMAP_PATH + '/' + df.iloc[idx]['local_audio_path'].split('/')[-1].replace('.mp3', '.json'))
+        if os.stat(df.iloc[idx]['local_text_path']).st_size == 0:
+            print(df.iloc[idx]['local_text_path'])
+            empty_txts.append(df.iloc[idx]['local_text_path'])
+            continue
         ForcedAlignment(df.iloc[idx]['local_audio_path'],
         df.iloc[idx]['local_text_path']).align_audio_and_text(parameters.SYNCMAP_PATH + '/' + df.iloc[idx]['local_audio_path'].split('/')[-1].replace('.mp3', '.json'))
 
-    #print(df.head())
+    with open('empty_txt.txt', 'w+') as f:
+        for item in empty_txts:
+            f.write("%s\n" % item)
 
-    #ForcedAlignment().align_audio_and_text()
+
 
 
 

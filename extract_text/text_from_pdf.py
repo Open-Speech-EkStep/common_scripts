@@ -12,7 +12,6 @@ from krutidev_unicode_converter import krutidev_to_unicode
 import parameters
 from glob import glob
 from tqdm import tqdm
-from joblib import Parallel, delayed
 
 
 class ExtractText:
