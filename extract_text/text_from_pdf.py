@@ -9,9 +9,14 @@ from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.pdfinterp import PDFPageInterpreter
 from io import StringIO
 from krutidev_unicode_converter import krutidev_to_unicode
+from Shreedev_Unicode_converter import shreedev_to_unicode
+from gurmukhi_converter import drchaitrik_to_unicode
 import parameters
 from glob import glob
 from tqdm import tqdm
+import subprocess
+import requests
+from joblib import Parallel, delayed
 
 
 class ExtractText:
@@ -36,16 +41,35 @@ class ExtractText:
                 interpreter.process_page(page)
         return output_string.getvalue()
 
+    def txt_from_response(self, line, url='https://inference.vakyansh.in/encode-text'):
+        PARAMS = {'type': 'krutidev', 'text': line}
+        try:
+            req = requests.get(url=url, params=PARAMS)
+            data = req.json()
+
+        except:
+            return 'bad character'
+
+        return data['encoded_data']
+
+    def encoding_to_unicode(self, encoded_text):
+        return drchaitrik_to_unicode(encoded_text)
+
     def convert_to_unicode(self, sep='।'):
-        krutidev_lines = self.get_text().split('\n')
-        unicode_lines = [krutidev_to_unicode(line) for line in krutidev_lines]
+        encoded_lines = self.get_text().split('\n')
+
+        unicode_lines = Parallel(n_jobs=-1)(delayed(self.txt_from_response)(line) for line in tqdm(encoded_lines) if line)
+
         combined_text = ''
         for line in unicode_lines:
             words = line.split()
             if len(words) < 5:
                 continue
-            combined_text = combined_text + ' '.join(words)
+            combined_text = combined_text + ' '.join(words) + ' '
+
         unicode_sentences = combined_text.split(sep=sep)
+        if len(unicode_sentences) < 3:
+            print(unicode_sentences)
         return unicode_sentences
 
     def clean_text(self):
@@ -55,6 +79,8 @@ class ExtractText:
         unicode_sentence_list = [l.replace('-', '') for l in unicode_sentence_list]
         unicode_sentence_list = [l.replace(',', '') for l in unicode_sentence_list]
         clean_unicode_sentence_list = [l.strip() for l in unicode_sentence_list]
+        #print(clean_unicode_sentence_list)
+        #print(len(clean_unicode_sentence_list))
         return clean_unicode_sentence_list
 
     def create_txt_file(self, file_path):
@@ -66,8 +92,20 @@ class ExtractText:
 if __name__ == '__main__':
     pdf_folder_path = parameters.PDF_FOLDER_PATH
     txt_folder_path = parameters.TXT_FOLDER_PATH
+    os.makedirs(txt_folder_path, exist_ok=True)
     pdf_files = glob(pdf_folder_path + '/' + '*.pdf')
-    
+
     for pdf_file in tqdm(pdf_files):
-        txt_file_name = pdf_file.split('/')[-1].replace('.pdf', '.txt')
-        ExtractText(pdf_file).create_txt_file(txt_folder_path + '/' + txt_file_name)
+        #print(pdf_file)
+        cmd = "strings " + pdf_file + " | grep FontName"
+
+        try:
+            text_encodings = subprocess.check_output(cmd, shell=True, text=True, encoding='utf-8')
+            encoding_check = text_encodings.find('Kruti')
+            if encoding_check != -1:
+                txt_file_name = pdf_file.split('/')[-1].replace('.pdf', '.txt')
+                ExtractText(pdf_file).create_txt_file(txt_folder_path + '/' + txt_file_name)
+            else:
+                print('Multiple encodings ', pdf_file)
+        except:
+            print("Text not extractable ", pdf_file)

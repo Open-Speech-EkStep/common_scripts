@@ -1,5 +1,4 @@
 import parameters
-from aeneas.exacttiming import TimeValue
 from aeneas.executetask import ExecuteTask
 from aeneas.language import Language
 from aeneas.syncmap import SyncMapFormat
@@ -19,7 +18,7 @@ class ForcedAlignment:
 
     def align_audio_and_text(self, file_path):
         config = TaskConfiguration()
-        config[gc.PPN_TASK_LANGUAGE] = Language.HIN
+        config[gc.PPN_TASK_LANGUAGE] = Language.PAN
         config[gc.PPN_TASK_IS_TEXT_FILE_FORMAT] = TextFileFormat.PLAIN
         config[gc.PPN_TASK_OS_FILE_FORMAT] = SyncMapFormat.JSON
         task = Task()
@@ -36,6 +35,9 @@ if __name__ == '__main__':
 
     df = pd.read_csv(parameters.METADA_CSV_PATH)
 
+    df = df[~df.duplicated(['text_path'], keep=False)]
+    df = df[~df.duplicated(['audio_path'], keep=False)]
+
     df['local_audio_path'] = df['audio_path'].apply(lambda x: parameters.AUDIO_FOLDER_PATH + '/' + x.split('/')[-1])
     df['local_text_path'] = df['text_path'].apply(lambda x: parameters.TXT_FOLDER_PATH + '/' + x.split('/')[-1])
     df['local_text_path'] = df['local_text_path'].apply(lambda x: x.replace('.pdf', '.txt'))
@@ -43,12 +45,15 @@ if __name__ == '__main__':
     empty_txts = []
 
     for idx in tqdm(range(len(df))):
-        if os.stat(df.iloc[idx]['local_text_path']).st_size == 0:
-            print(df.iloc[idx]['local_text_path'])
-            empty_txts.append(df.iloc[idx]['local_text_path'])
-            continue
-        ForcedAlignment(df.iloc[idx]['local_audio_path'],
-        df.iloc[idx]['local_text_path']).align_audio_and_text(parameters.SYNCMAP_PATH + '/' + df.iloc[idx]['local_audio_path'].split('/')[-1].replace('.mp3', '.json'))
+        if os.path.isfile(df.iloc[idx]['local_text_path']):
+            if os.stat(df.iloc[idx]['local_text_path']).st_size == 0:
+                print(df.iloc[idx]['local_text_path'])
+                empty_txts.append(df.iloc[idx]['local_text_path'])
+                continue
+            ForcedAlignment(df.iloc[idx]['local_audio_path'],
+            df.iloc[idx]['local_text_path']).align_audio_and_text(parameters.SYNCMAP_PATH + '/' + df.iloc[idx]['local_audio_path'].split('/')[-1].replace('.mp3', '.json'))
+        else:
+            print("Text does not exist")
 
     with open('empty_txt.txt', 'w+') as f:
         for item in empty_txts:
