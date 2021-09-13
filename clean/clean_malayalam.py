@@ -13,31 +13,32 @@ from indicnlp.tokenize.indic_tokenize import trivial_tokenize
 from indicnlp.normalize.indic_normalize import IndicNormalizerFactory
 
 
-lang = 'hi' # because maithili and hindi both use devanagri script, so we are using devanagri normaliser
+lang = 'ml'
 
-
-
+pattern = "[^  ം-ഃഅ-ഋഎ-ഐഒ-നപ-ഺാ-ൃെ-ൈൊ-്ൺ-ൾ]+"    
 normalizer = IndicNormalizerFactory().get_normalizer(lang)
 
-pattern_to_remove = "[ಂ-ಃಅ-ಋಎ-ಐಒ-ಘಚ-ನಪ-ರಲ-ಳವ-ಹಾ-ೃೆ-ೈೊ-್0-9a-zA-Z०-९©·ŁłŽ]"
 
-def get_clean_lines(line):
+def noramlize_and_tok_text(sent):
+    normalized = normalizer.normalize(sent)
+    processed = ' '.join(trivial_tokenize(normalized, lang))
+    return processed
+
+def get_clean_lines(line, pattern):
     
     '''
     Returns line if no foreign character other than pattern is present else returns empty string
     '''
-    line = line.strip()
     
-    line = re.sub('[%s]' % re.escape("!\"#$%&\()\'*+,-./:;<=>?@[\\]^_`{|}~‘’“‹€◌।"), '', line)
-    line = line.replace('\x8f', '')
-    line = line.replace('\x90', '')
-    if re.search(pattern_to_remove, line):
-        print(re.findall(pattern_to_remove, line))
-        return ''
-    else:
+    line = re.sub('[%s]' % re.escape("!\।\"#$%&\()*+,-./:;<=>?@[\\]^_`{|}~"), '', line)
+    line = noramlize_and_tok_text(line)
+    
+    if not re.search(pattern, line):
         return ' '.join([word.upper() for word in line.split() if word])
-
-
+    else:
+        print(line)
+        return ''
+    
 def read_text_file(fpath):
     with open(fpath, 'r', encoding='utf-8') as f:
         return f.read()
@@ -58,14 +59,10 @@ def copy_file(src, dst, sym):
 def get_duration(fpath):
     return sox.file_info.duration(fpath)
 
-def noramlize_and_tok_text(sent):
-    normalized = normalizer.normalize(sent)
-    processed = ' '.join(trivial_tokenize(normalized, lang))
-    return processed
 
 def process_text_file(fpath, dst_txt_path, sym):
     sentence = read_text_file(fpath)
-    cleaned_sentence = get_clean_lines(sentence)#, pattern)
+    cleaned_sentence = get_clean_lines(sentence, pattern)
     
     dst_folder = '/'.join(dst_txt_path.split('/')[:-1])
     
@@ -73,7 +70,7 @@ def process_text_file(fpath, dst_txt_path, sym):
     
     if not cleaned_sentence == '':
         
-        cleaned_sentence = noramlize_and_tok_text(cleaned_sentence)
+       
         
         write_text_file(cleaned_sentence, dst_txt_path)
         copy_file(fpath.replace('.txt', '.wav'), dst_txt_path.replace('.txt', '.wav'), sym)
