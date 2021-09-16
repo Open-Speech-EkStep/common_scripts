@@ -1,4 +1,4 @@
-# Usage -> python WadaSNR.py --inp-folder='path/to/folder/containing/wav/files' --wada-path='common_scipts/misc/WadaSNR'
+# Usage -> python WadaSNR.py --inp-folder='path/to/folder/containing/wav/files' --wada-path='common_scripts/misc/WadaSNR'
 
 import os, sys
 import glob
