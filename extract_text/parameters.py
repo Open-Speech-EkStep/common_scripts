@@ -1,10 +1,10 @@
-PDF_FOLDER_PATH = 'data/dogri/pdf'
-TXT_FOLDER_PATH = 'data/dogri/txt'
+PDF_FOLDER_PATH = 'data/sambalpuri/pdf'
+TXT_FOLDER_PATH = 'data/sambalpuri/txt'
 
-AUDIO_FOLDER_PATH = 'data/dogri/mp3'
-SYNCMAP_PATH = 'data/dogri/syncmap_json'
+AUDIO_FOLDER_PATH = 'data/sambalpuri/mp3'
+SYNCMAP_PATH = 'data/sambalpuri/syncmap_json'
 
-METADA_CSV_PATH = 'data/dogri/Dogri.csv'
-WAV_FOLDER_PATH = 'data/dogri/wav'
+METADA_CSV_PATH = 'data/sambalpuri/Sambalpuri.csv'
+WAV_FOLDER_PATH = 'data/sambalpuri/wav'
 
-LABELLED_DATA_PATH = 'data/dogri/processed_data'
+LABELLED_DATA_PATH = 'data/sambalpuri/processed_data'
