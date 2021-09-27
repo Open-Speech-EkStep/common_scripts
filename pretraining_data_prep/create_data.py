@@ -1,4 +1,4 @@
-# Aman_Tiwari
+
 # code to concatenate audio files to create training files for wav2vec2
 # to run syntax is: python create_data.py <path to source> <path to destination>
 

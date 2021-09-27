@@ -1,4 +1,4 @@
-## Author: Harveen Singh
+
 ## Purpose: 
 ## 1. Resamples audios to 16000
 ## 2. Extract transcripted text from large transcription file which contains other administrative information

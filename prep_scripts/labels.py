@@ -1,4 +1,4 @@
-# Authors: Aman_Tiwari, Harveen Chadha
+
 # Usage: python labels.py --jobs 64 --tsv <path to train.tsv>train.tsv --output-dir <destination dir> --output-name test --txt-dir
 
 import argparse

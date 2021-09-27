@@ -1,4 +1,4 @@
-# Authors: Aman_Tiwari, Harveen Chadha
+
 # Usage: python dict_and_lexicon_maker.py --wrd <path to train.wrd>train.wrd --lexicon <destnation path>/lexicon.lst --dict <destnation path>/dict.ltr.txt
 
 import numpy as np
