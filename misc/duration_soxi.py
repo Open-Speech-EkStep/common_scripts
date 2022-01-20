@@ -21,7 +21,7 @@ def get_duration_single_file(local_file):
 
     return {'file_name':local_file ,'duration': duration, 'sample_rate': sample_rate, 'channels': channels, 'bitrate': bitrate}
 
-def get_duration(path_local):
+def get_duration(path_local, name):
     if not os.path.exists(path_local):
         raise Exception("Sorry this path doesn't exists")
     files = glob.glob(path_local + '/**/*.wav', recursive=True)
@@ -33,7 +33,7 @@ def get_duration(path_local):
     #print(total_seconds)
     total_ = total_seconds.sum(axis=0,skipna = True)
  
-    total_seconds.to_csv('FILENAME.csv', index=False)
+    total_seconds.to_csv(name + '.csv', index=False)
     print('CSV file Generated!')
 
     #print(total_)
@@ -46,4 +46,5 @@ def get_duration(path_local):
 
 if __name__ == "__main__":
     path = sys.argv[1]
-    get_duration(path)
+    name = sys.argv[2]
+    get_duration(path, name)
