@@ -23,4 +23,3 @@ class Perplexity:
 if __name__ == '__main__':
 
     p = Perplexity(conf.hindi_lm).subtitle_perplexity(conf.hindi_subtitle)
-    print(p)
