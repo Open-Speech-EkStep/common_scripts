@@ -1,8 +1,6 @@
 import pysrt
 import kenlm
-import matplotlib.pyplot as plt
-import sys
-import pandas as pd
+import conf
 
 class Perplexity:
     def __init__(self, model):
@@ -24,9 +22,5 @@ class Perplexity:
     
 if __name__ == '__main__':
 
-    p = Perplexity(sys.argv[1]).subtitle_perplexity(sys.argv[2])
-
-    df = pd.DataFrame({'perplexity': p})
-    df.to_csv(sys.argv[3], index=False)
-
-    
+    p = Perplexity(conf.hindi_lm).subtitle_perplexity(conf.hindi_subtitle)
+    print(p)
