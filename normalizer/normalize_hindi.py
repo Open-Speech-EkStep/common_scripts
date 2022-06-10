@@ -6,5 +6,6 @@ normalizer = IndicNormalizerFactory().get_normalizer(lang)
 
 def normalize_text(sent):
     normalized = normalizer.normalize(sent)
-    processed = ' '.join(trivial_tokenize(normalized, lang))
-    return processed
+    text = ' '.join(trivial_tokenize(normalized, lang))
+    text=text.replace('\u090d','\u090f'+ '\u0901') # Custom rule 1 for ऍ
+    return text
