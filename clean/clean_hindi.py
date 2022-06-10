@@ -9,21 +9,26 @@ from tqdm import tqdm
 from joblib import Parallel, delayed
 from glob import glob
 
-from indicnlp.tokenize.indic_tokenize import trivial_tokenize
-from indicnlp.normalize.indic_normalize import IndicNormalizerFactory
+
+import sys
+sys.path.insert(0, os.path.dirname("../normalizer"))
+from normalizer.normalize_hindi import normalize_hindi_text
+
+#from indicnlp.tokenize.indic_tokenize import trivial_tokenize
+#from indicnlp.normalize.indic_normalize import IndicNormalizerFactory
 
 
-lang = 'hi'
+#lang = 'hi'
 
 pattern = "[^ ँ-ःअ-ऋए-ऑओ-नप-रलव-हा-ृॅे-ॉो-़्]+"
     
-normalizer = IndicNormalizerFactory().get_normalizer(lang)
+#normalizer = IndicNormalizerFactory().get_normalizer(lang)
 
 
-def noramlize_and_tok_text(sent):
-    normalized = normalizer.normalize(sent)
-    processed = ' '.join(trivial_tokenize(normalized, lang))
-    return processed
+#def noramlize_and_tok_text(sent):
+#    normalized = normalizer.normalize(sent)
+#    processed = ' '.join(trivial_tokenize(normalized, lang))
+#    return processed
 
 def get_clean_lines(line, pattern):
     
@@ -32,15 +37,17 @@ def get_clean_lines(line, pattern):
     '''
     
     line = re.sub('[%s]' % re.escape("!\।\"#$%&\()*+,-./:;<=>?@[\\]^_`{|}~"), '', line)
-    line = noramlize_and_tok_text(line)
+    line = normalize_hindi_text(line)
     line = line.replace('Noise', '')
     line = line.replace('cough', '')
     line = line.replace('babble', '')
     line = line.replace('Overlap', '')
     line = line.replace('Laugh', '')
     line = line.replace('music', '')
-    line = line.replace('I', '')
-    line = line.replace('Applause', '')
+    line = line.replace('bn', '')
+    line = line.replace('SIL', '')
+    line = line.replace('I','')
+    line=line.replace('Applause','')
     
     if not re.search(pattern, line):
         return ' '.join([word.upper() for word in line.split() if word])
@@ -50,7 +57,7 @@ def get_clean_lines(line, pattern):
     
 def read_text_file(fpath):
     with open(fpath, 'r', encoding='utf-8') as f:
-        return f.read()
+        return f.read().strip()
     
 def write_text_file(line, fpath):
     with open(fpath, 'w+', encoding='utf-8') as f:
@@ -68,8 +75,16 @@ def copy_file(src, dst, sym):
 def get_duration(fpath):
     return sox.file_info.duration(fpath)
 
-
+import os
 def process_text_file(fpath, dst_txt_path, sym):
+    if 'original_' in fpath:
+        return 0
+    
+    if 'rejected' in fpath:
+        return 0
+    if os.path.exists(dst_txt_path):
+        return 0
+
     sentence = read_text_file(fpath)
     cleaned_sentence = get_clean_lines(sentence, pattern)
     
@@ -80,15 +95,18 @@ def process_text_file(fpath, dst_txt_path, sym):
     if not cleaned_sentence == '':
         
        
-        
-        write_text_file(cleaned_sentence, dst_txt_path)
-        copy_file(fpath.replace('.txt', '.wav'), dst_txt_path.replace('.txt', '.wav'), sym)
-        
+        try:
+            write_text_file(cleaned_sentence, dst_txt_path)
+            copy_file(fpath.replace('.txt', '.wav'), dst_txt_path.replace('.txt', '.wav'), sym)
+        except:
+            return 0
         return 0
         
     else:
-        return get_duration(fpath.replace('.txt', '.wav'))
-        
+        try:
+            return get_duration(fpath.replace('.txt', '.wav'))
+        except:
+            return 0
 
 def get_file_list(inp_folder):
     return glob(inp_folder+'/**/*.txt', recursive=True)
